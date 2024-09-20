@@ -1,0 +1,95 @@
+/* Global styles for a modern look */
+body {
+    margin: 0;
+    margin-left: 10px;
+    margin-top: 10px;
+    padding: 0;
+    font-family: "Roboto", sans-serif;
+    background-color: #f4f6f9; /* Light grey background for modern look */
+}
+
+/* Wrapper to center the content */
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100vh;
+    padding: 20px;
+}
+
+/* Style the search input */
+.search {
+    width: 300px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #d1d5db;
+    font-size: 16px;
+    margin-bottom: 20px;
+    transition: box-shadow 0.3s ease;
+}
+
+.search:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.3); /* Blue shadow on focus */
+}
+
+/* Styling the org chart component */
+.graph {
+    width: 100%;
+    max-width: 1200px;
+    height: 75vh; /* Org chart takes up most of the screen */
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* Ensures clean edges if graph overflows */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+}
+
+/* Responsive layout to fit different screen sizes */
+@media (max-width: 768px) {
+    .search {
+        width: 80%; /* Adjust search bar width for smaller screens */
+    }
+
+    .graph {
+        width: 100%;
+        height: 60vh; /* Reduce height on smaller screens */
+    }
+}
+
+/* Optional style for the controls buttons inside the org chart */
+button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3; /* Darken button on hover */
+}
+
+button:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Overview component styling */
+.overview {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 150px;
+    height: 150px;
+    border: 2px solid #007bff;
+    background-color: white;
+    border-radius: 8px;
+}
