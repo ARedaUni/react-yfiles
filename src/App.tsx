@@ -11,6 +11,7 @@ import {
   OrgChartControlButtons,
   useOrgChartContext,
   OrgChartProvider,
+  RenderItemProps,
 } from "@yworks/react-yfiles-orgchart";
 import "@yworks/react-yfiles-orgchart/dist/index.css";
 import { debounce } from "lodash"; // Using lodash for debounce
@@ -57,6 +58,26 @@ function OrgChartWrapper() {
     [],
   );
 
+  type Employee = {
+    name?: string;
+    status?: string;
+    position?: string;
+    email?: string;
+    phone?: string;
+  };
+  
+
+  function MyOrgChartItem(props: RenderItemProps<CustomOrgChartItem<Employee>>) {
+    const { dataItem } = props;
+    return (
+      <div
+        className={`${dataItem.name === "Eric Joplin" ? "ceo" : "employee"} item`}
+      >
+        <div>{dataItem.name}</div>
+      </div>
+    );
+  }
+
  
   return (
     <>
@@ -78,6 +99,7 @@ function OrgChartWrapper() {
         className="graph"
         onItemSelect={onItemSelect}
         searchNeedle={searchQuery}
+     //   renderItem={MyOrgChartItem}
         data={data} // Use filtered data based on the search
         renderContextMenu={({ item }) => (
           <button onClick={() => alert(`${item?.name} clicked!`)}>
