@@ -1,16 +1,7 @@
 import "./App.css";
-import yFilesLicense from "/Users/wahida/Documents/yfiles/yFiles-for-HTML/lib/license.json";
-import data from "./data.json";
-import { useState, useCallback } from "react";
-registerLicense(yFilesLicense);
-
-//our application has now the following features:
-//an application context that allows us to interact with the graph, done through function orgchartwrapper
-//an overview and toolbar
-//a search bar
-// registration of when an item is selected, so that i can update a bar on the right side with a persons details(and their subordinates(cheeky i know))
-
-//we can use renderOrgChartItem function in order to separate the different nodes that we have
+import yFilesLicense from "A:\\yfiles\\yFiles-for-HTML\\lib\\license.json";
+import data from "./optimized_records.json";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import {
   CustomOrgChartItem,
   OrgChart,
@@ -21,69 +12,95 @@ import {
   useOrgChartContext,
   OrgChartProvider,
 } from "@yworks/react-yfiles-orgchart";
-
 import "@yworks/react-yfiles-orgchart/dist/index.css";
+import { debounce } from "lodash"; // Using lodash for debounce
+import React from "react";
 
 registerLicense(yFilesLicense);
 
 function OrgChartWrapper() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [visibleData, setVisibleData] = useState([]);
+  const [dataChunkSize] = useState(50); // Load 50 records at a time
   const { fitContent, zoomToItem, zoomToOriginal } = useOrgChartContext()!;
-  const onItemSelect = useCallback(
-    //this method will allow me to display the specific information in a sidebar
-    (selectedItems: CustomOrgChartItem[]) =>
-      console.log(
-        selectedItems.length
-          ? `selected: ${selectedItems[0].name}`
-          : "nothing selected",
-      ),
+
+  useEffect(() => {
+    // Load initial data chunk
+    setVisibleData(data.slice(0, dataChunkSize));
+  }, [dataChunkSize]);
+
+  const loadMoreData = useCallback(() => {
+    // Load more data when needed
+    setVisibleData((prevData) => [
+      ...prevData,
+      ...data.slice(prevData.length, prevData.length + dataChunkSize),
+    ]);
+  }, [dataChunkSize]);
+
+  const handleSearch = useCallback(
+    debounce((query) => {
+      setSearchQuery(query);
+    }, 300), // Debounce search input to optimize performance
     [],
   );
+
+  const onItemSelect = useCallback(
+    (selectedItems: CustomOrgChartItem[]) =>
+      // console.log(
+      //   selectedItems.length
+      //     ? `Selected: ${selectedItems[0].name}`
+      //     : "Nothing selected",
+      // ),
+         selectedItems.length
+          ? zoomToItem(selectedItems[0])
+          : "Nothing selected",
+    [],
+  );
+
+ 
   return (
     <>
       <input
-        //the search button we will use
         className="search"
-        type={"search"}
+        type="search"
         placeholder="Search..."
-        onChange={(event) => {
-          setSearchQuery(event.target.value);
-        }}
+        onChange={(event) => handleSearch(event.target.value)}
         onKeyDown={(event) => {
-          // Check if the Enter key is pressed
           if (event.key === "Enter") {
-            // Call zoomToItem with the search query
-            zoomToItem(searchQuery); // FIGURE OUT HOW TO ZOOM TO THE ITEM :D
+            zoomToItem(searchQuery); // Zoom to the item
           }
         }}
-      ></input>
+      />
+      <button className="loadmore" onClick={loadMoreData}>
+        Load More
+      </button>
       <OrgChart
         className="graph"
         onItemSelect={onItemSelect}
         searchNeedle={searchQuery}
-        onSearch={(data: CustomOrgChartItem, searchQuery: string) =>
-          data?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-        }
-        data={data}
+        data={data} // Use filtered data based on the search
         renderContextMenu={({ item }) => (
-          //use to create something when you right click a node (can be used for navigation, for any options)
-          <button onClick={() => alert(`${item?.name} c licked!`)}>
+          <button onClick={() => alert(`${item?.name} clicked!`)}>
             Click here!
           </button>
         )}
       >
-        <Overview></Overview>
-        <Controls buttons={OrgChartControlButtons}></Controls>
+        <Overview />
+        <Controls buttons={OrgChartControlButtons} />
       </OrgChart>
     </>
   );
 }
 
+const MemoizedOrgChartWrapper = React.memo(OrgChartWrapper);
+
 function App() {
   return (
+    <div className="bodywrapper">
     <OrgChartProvider>
-      <OrgChartWrapper></OrgChartWrapper>
+      <MemoizedOrgChartWrapper />
     </OrgChartProvider>
+    </div>
   );
 }
 
